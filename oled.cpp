@@ -9,6 +9,7 @@
 
 float power(float num, const float p)
 {
+	//Power function to assist in parsePrice()
 	float constantNum = num;
 	if(p==0)
 		return 1;
@@ -27,6 +28,7 @@ float power(float num, const float p)
 
 float parsePrice(const char line[])
 {
+	//this is basically a string-to-float function, nothing special, move along.
 	int i = 0;
 	float price = 0;
 	bool escape = true;
@@ -111,17 +113,17 @@ float priceBTC()
 {
 	std::string command;
 	char intake[20];
-	std::ifstream infile;
-	command = "curl -k --silent \"https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD\"  | tee mostRecentBTC.txt";
+	ifstream infile;
+	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD\" | tee mostRecentBTC.txt";//Pull the price and store it in a file
   system(command.c_str());
 	infile.open("mostRecentBTC.txt");
 	if(!infile.is_open())
 		return -1;
-	infile.getline(intake, 20);
-	if(intake[2] != 'U')
+	infile.getline(intake, 20);//Read the single line of data present
+	if(intake[2] != 'U')//Check to see if its valid
 		return -1;
-	system("rm -R mostRecentBTC.txt");
-	float price = parsePrice(intake);
+	system("rm -R mostRecentBTC.txt");//Delete the file
+	float price = parsePrice(intake);//Parse the price to return the value of the coin
 	return price;
 }
 
@@ -129,17 +131,17 @@ float priceETH()
 {
 	std::string command;
 	char intake[20];
-	std::ifstream infile;
-	command = "curl -k --silent \"https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD\" | tee mostRecentETH.txt";
+	ifstream infile;
+	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD\" | tee mostRecentETH.txt";//Pull the price and store it in a file
 	system(command.c_str());
 	infile.open("mostRecentETH.txt");
 	if(!infile.is_open())
 		return -1;
-	infile.getline(intake, 20);
-	system("rm -R mostRecentETH.txt");
-	if(intake[2] != 'U')
+	infile.getline(intake, 20);//Read the single line of data present
+	if(intake[2] != 'U')//Check to see if its valid
 		return -1;
-	float price = parsePrice(intake);
+	system("rm -R mostRecentETH.txt");//Delete the file
+	float price = parsePrice(intake);//Parse the price to return the value of the coin
 	return price;
 }
 
@@ -147,17 +149,17 @@ float priceLTC()
 {
 	std::string command;
 	char intake[20];
-	std::ifstream infile;
-	command = "curl -k --silent \"https://min-api.cryptocompare.com/data/price?fsym=LTC&tsyms=USD\" | tee mostRecentLTC.txt";
+	ifstream infile;
+	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=LTC&tsyms=USD\" | tee mostRecentLTC.txt";//Pull the price and store it in a file
 	system(command.c_str());
 	infile.open("mostRecentLTC.txt");
 	if(!infile.is_open())
 		return -1;
-	infile.getline(intake, 20);
-	system("rm -R mostRecentLTC.txt");
-	if(intake[2] != 'U')
+	infile.getline(intake, 20);//Read the single line of data present
+	if(intake[2] != 'U')//Check to see if its valid
 		return -1;
-	float price = parsePrice(intake);
+	system("rm -R mostRecentLTC.txt");//Delete the file
+	float price = parsePrice(intake);//Parse the price to return the value of the coin
 	return price;
 }
 
