@@ -6,7 +6,8 @@
 #include <sys/stat.h>
 #include <chrono>
 #include <iostream>
-#define nullptr 0;
+#include "FileInterface.cpp"
+#define nullptr 0
 
 enum CURRENCIES {BITCOIN, ETHEREUM, LITECOIN, UNDEFINED};
 
@@ -17,7 +18,7 @@ class Currency
         Currency(const char* priceFileName);
         float getDeltaPrice()
         {
-            if(m_size == 0)
+            /*if(m_size == 0)
                 return -1;
             if(m_size == 1)
                 return 0;
@@ -33,11 +34,12 @@ class Currency
                     average += m_prices[i];
                 average /= (m_size-1);
                 return m_prices[m_size-1] - average;
-            }
+            }*/
+            return entries[23].getValue(); - entries[0].getValue();
         }
         float getDeltaPercent()
         {
-            if(m_size == 0)
+           /*if(m_size == 0)
                 return -1;
             if(m_size == 1)
                 return 0;
@@ -53,18 +55,20 @@ class Currency
                     average += m_prices[i];
                 average /= (m_size-1);
                 return (m_prices[m_size-1] - average) / average;
-            }
+            }*/
+            return (entries[23].getValue() - entries[0].getValue()) / entries[23].getValue();
         }
         float getPrice()
         {
-            std::cout << "Number of Prices: " << m_size << std::endl;
+            /*std::cout << "Number of Prices: " << m_size << std::endl;
             if(m_size == 0)
                 return -1;
-            return m_prices[m_size-1];
+            return m_prices[m_size-1];*/
+            return entries[23].getValue();
         }
         void addPrice(float price)
         {
-            if(price < 0)
+            /*if(price < 0)
                 return;
             //std::cout << "Current Size: " << m_size << std::endl;
             std::ofstream currencyFile(m_priceFileName, std::ios::out | std::ios::app | std::ios::binary);
@@ -83,12 +87,24 @@ class Currency
             {
                 m_prices[i] = temp[i];
             }
-            m_prices[m_size-1] = price;
+            m_prices[m_size-1] = price;*/
+
+            Entry* tempEntries = new Entry[24];
+            for(int i = 0; i < 23; i++)
+            {
+                tempEntries[i] = entries[i+1];
+            }
+            Entry newEntry(price);
+            tempEntries[23] = newEntry;
+            delete entries;
+            entries = tempEntries;
+            writeData(m_priceFileName, entries);
         }
     unsigned char* m_bitmap;
     private:
-    float* m_prices;
-    unsigned int m_size;
+    //float* m_prices;
+    //unsigned int m_size;
+    Entry* entries;
     char* m_priceFileName;
 };
 
@@ -104,7 +120,9 @@ Currency::Currency(const char* priceFileName)
     }
     m_priceFileName[fileNameSize] = 0;
 
-    struct stat results;
+    readData(m_priceFileName, entries);
+
+    /*struct stat results;
     std::ifstream currencyFile(priceFileName, std::ios::in | std::ios::binary);
     if(currencyFile.is_open())
     {
@@ -127,7 +145,7 @@ Currency::Currency(const char* priceFileName)
         m_prices = nullptr;
         std::ofstream makeFile(priceFileName, std::ios::binary);
         makeFile.close();
-    }
+    }*/
 }
 
 #endif

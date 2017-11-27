@@ -7,11 +7,9 @@ using namespace std;
 class Entry{
 public:
   Entry(){
-    strcpy(date, "January 1, 2017");
     value = -1;
   }
-  Entry(char* _date, float _value){
-    strcpy(this->date, _date);
+  Entry(float _value){
     this->value = _value;
   } //Constructor
   //~Entry(); //Destructor
@@ -19,11 +17,10 @@ public:
   float getValue(){
     return value;
   }
-  char* getDate(){
-    return date;
+  void setValue(float newValue){
+      value = newValue;
   }
 private:
-  char date[80];
   float value;
 };
 
@@ -50,13 +47,21 @@ bool readData(const char filename[], Entry*& entries){
       //log failed to open file
       return false;
   	}
-
-    for (int fileLineNumber = 0; fileLineNumber < 24; fileLineNumber++){ //loops 24 times
-      file.seekg(fileLineNumber); //seeks line number
+    /*for (int fileLineNumber = 0; fileLineNumber < 24; fileLineNumber++){ //loops 24 times
+      //file.seekg(fileLineNumber); //seeks line number
       Entry newEntry; //place holder
       file.read((char *)&newEntry, sizeof(Entry)); //reads binary line, constructs the new entry
       entries[fileLineNumber] = newEntry; //adds new entry to array of entries
+    }*/
+    std::cout << "Values in file: ";
+    for(int i = 0; i < 24; i++)
+    {
+        float temp;
+        file.read((char*)&temp, sizeof(float));
+        entries[i].setValue(temp);
+        std::cout << temp << ", ";
     }
+    std::cout << std::endl;
 
     file.close(); //closes stream
     return true;
@@ -67,16 +72,21 @@ bool readData(const char filename[], Entry*& entries){
 bool writeData(const char filename[], Entry* entries){
 
   fstream file(filename, ios::binary | ios::out | ios::trunc); //output stream
-  char newLine[1] = {'\n'};  //used to make new lines in binary file
+  //char newLine[1] = {'\n'};  //used to make new lines in binary file
   if (!file.is_open()){
     //log failed to open file
     return false;
   }
 
-  for (int fileLineNumber = 0; fileLineNumber < 24; fileLineNumber++){ //loops 24 times
+  /*for (int fileLineNumber = 0; fileLineNumber < 24; fileLineNumber++){ //loops 24 times
     Entry curEntry = entries[fileLineNumber]; //entry from array of entries to be written
     file.write((char *)&curEntry, sizeof(Entry)); //writes entry in binary
-    file.write((char *)newLine, sizeof(char)); //makes new line
+    //file.write((char *)newLine, sizeof(char)); //makes new line
+  }*/
+  for(int i = 0; i < 24; i++)
+  {
+      float temp = entries[i].getValue();
+      file.write((char*)&temp, sizeof(float));
   }
 
   file.close(); //closes stream
@@ -88,7 +98,9 @@ bool writeData(const char filename[], Entry* entries){
 int main (){
   Entry* entries;
   fillEntries(entries);
-  writeData("test.cpp", entries);
+  writeData("test.dat", entries);
+  readData("test.dat", entries);
+
  //delete above after you use it once
 //readData will return array of entries
 //keep track of the array of entries and use it when you call writeData
