@@ -11,6 +11,7 @@ float power(float num, const float p);
 //Fetches the price of bitcoin from min-api-cryptocompare
 float priceBTC()
 {
+	logFile("Fetching Bitcoin price in priceBTC().", 0);
 	std::string command;
 	char intake[20];
 	ifstream infile;
@@ -18,18 +19,29 @@ float priceBTC()
   system(command.c_str());
 	infile.open("mostRecentBTC.txt");
 	if(!infile.is_open())
-		return -1;
+	{
+		logFile("Fetching Bitcoin Price failed, unable to open resulting text file from cURL command.", -1);
+		return -1;	
+	}
+
 	infile.getline(intake, 20);//Read the single line of data present
 	if(intake[2] != 'U')//Check to see if its valid
+	{
+		logFile("Fetching Bitcoin price failed, incorrect output from cURL command.", -1);
 		return -1;
+	}
+	
+
 	system("rm -R mostRecentBTC.txt");//Delete the file
 	float price = parsePrice(intake);//Parse the price to return the value of the coin
+	logFile("Bitcoin price fetched successfully.", 0);
 	return price;
 }
 
 //Fetches the price of ethererum from min-api-cryptocompare
 float priceETH()
 {
+	logFile("Fetching Ethereum price in priceETH().", 0);
 	std::string command;
 	char intake[20];
 	ifstream infile;
@@ -37,18 +49,28 @@ float priceETH()
 	system(command.c_str());
 	infile.open("mostRecentETH.txt");
 	if(!infile.is_open())
+	{
+		logFile("Fetching Ethereum price failed, unable to open resulting text file from cURL command.", -1);
 		return -1;
+	}
+
 	infile.getline(intake, 20);//Read the single line of data present
 	if(intake[2] != 'U')//Check to see if its valid
+	{
+		logFile("Fetching Ethereum price failed, incorrect output from cURL command.", -1);
 		return -1;
+	}
+
 	system("rm -R mostRecentETH.txt");//Delete the file
 	float price = parsePrice(intake);//Parse the price to return the value of the coin
+	logFile("Ethereum price fetched successfully.", 0);
 	return price;
 }
 
 //Fetches the price of Litecoin from min-api-cryptocompare
 float priceLTC()
 {
+	logFile("Fetching LiteCoin price in priceLTC().", 0);
 	std::string command;
 	char intake[20];
 	ifstream infile;
@@ -56,12 +78,20 @@ float priceLTC()
 	system(command.c_str());
 	infile.open("mostRecentLTC.txt");
 	if(!infile.is_open())
-		return -1;
+	{
+		logFile("Fetching LiteCoin price failed, unable to open resulting text file from cURL command.", -1);
+		return -1;	
+	}
+	
 	infile.getline(intake, 20);//Read the single line of data present
 	if(intake[2] != 'U')//Check to see if its valid
-		return -1;
+	{
+		logFile("Fetching LiteCoin price failed, incorrect output from cURL command.", -1);
+		return -1;	
+	}
 	system("rm -R mostRecentLTC.txt");//Delete the file
 	float price = parsePrice(intake);//Parse the price to return the value of the coin
+	logFile("Litecoin price fetched successfully.", 0);
 	return price;
 }
 
