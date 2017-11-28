@@ -195,25 +195,9 @@ int logFile(const char toLog[], int sev)
   ofstream outLog;
   switch(sev)//Check severity level and output to matching log file.
   {
-    case 0:
-    {
-      outLog.open("cryptolog-severe.txt", fstream::app);//Open severe log in append format
-      if(!outLog.is_open())
-        return -1;
-      int i = 0;
-      outLog << timestamp << ": ";//Put timestamp at front of line
-      while(toLog[i])
-      {
-        outLog << toLog[i];//Output the toLog that was passed to the function
-        i++;
-      }
-      outLog << "\n\n";//Make space for a new log entry
-      outLog.close();
-      break;
-    }
     case -1:
     {
-      outLog.open("cryptolog-warn.txt", fstream::app);//Open warning log in append format
+      outLog.open("cryptologSevere.log", fstream::app);//Open severe log in append format
       if(!outLog.is_open())
         return -1;
       int i = 0;
@@ -229,7 +213,23 @@ int logFile(const char toLog[], int sev)
     }
     case 1:
     {
-      outLog.open("cryptolog-normal.txt", fstream::app);//Open normal log in append format
+      outLog.open("cryptologWarning.log", fstream::app);//Open warning log in append format
+      if(!outLog.is_open())
+        return -1;
+      int i = 0;
+      outLog << timestamp << ": ";//Put timestamp at front of line
+      while(toLog[i])
+      {
+        outLog << toLog[i];//Output the toLog that was passed to the function
+        i++;
+      }
+      outLog << "\n\n";//Make space for a new log entry
+      outLog.close();
+      break;
+    }
+    case 0:
+    {
+      outLog.open("cryptologNormal.log", fstream::app);//Open normal log in append format
       if(!outLog.is_open())
         return -1;
       int i = 0;
