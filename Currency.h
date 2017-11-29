@@ -7,6 +7,8 @@
 #include <chrono>
 #include <iostream>
 #include "FileInterface.cpp"
+#include "utility.h"
+
 #define nullptr 0
 
 enum CURRENCIES {BITCOIN, ETHEREUM, LITECOIN, UNDEFINED};
@@ -18,7 +20,8 @@ class Currency
         Currency(const char* priceFileName);
         float getDeltaPrice()
         {
-            /*if(m_size == 0)
+            /*TESTING CODE
+            if(m_size == 0)
                 return -1;
             if(m_size == 1)
                 return 0;
@@ -35,13 +38,17 @@ class Currency
                 average /= (m_size-1);
                 return m_prices[m_size-1] - average;
             }*/
+            
+            logFile("Getting Price Delta in Currency.h::getDeltaPrice()", 0);
             float dp = entries[23].getValue() - entries[0].getValue();
             std::cout << entries[1].getValue() << std::endl;
             return dp;
         }
         float getDeltaPercent()
         {
-           /*if(m_size == 0)
+           /*TESTING CODE
+           
+           if(m_size == 0)
                 return -1;
             if(m_size == 1)
                 return 0;
@@ -58,19 +65,26 @@ class Currency
                 average /= (m_size-1);
                 return (m_prices[m_size-1] - average) / average;
             }*/
+            
+            logFile("Getting Price Delta % in Currency.h::getDeltaPercent()", 0);
             return ((entries[23].getValue() - entries[0].getValue()) / entries[23].getValue()) * 100;
         }
         float getPrice()
         {
-            /*std::cout << "Number of Prices: " << m_size << std::endl;
+            /*TEST CODE
+            std::cout << "Number of Prices: " << m_size << std::endl;
             if(m_size == 0)
                 return -1;
             return m_prices[m_size-1];*/
+            
+            logFile("Fetching current price from within Currency class in Currency.h::getPrice()", 0);
             return entries[23].getValue();
         }
         void addPrice(float price)
         {
-            /*if(price < 0)
+            /*TEST CODE
+            
+            if(price < 0)
                 return;
             //std::cout << "Current Size: " << m_size << std::endl;
             std::ofstream currencyFile(m_priceFileName, std::ios::out | std::ios::app | std::ios::binary);
@@ -90,7 +104,14 @@ class Currency
                 m_prices[i] = temp[i];
             }
             m_prices[m_size-1] = price;*/
-
+            
+            logFile("Adding price to currency in Currency.h::addPrice().", 0);
+            
+            if(price < 0)
+            {
+                logFile("Invalid price passed to Currency.h::addPrice().", 1);
+                return;
+            }
             Entry* tempEntries = new Entry[24];
             for(int i = 0; i < 23; i++)
             {
@@ -112,6 +133,7 @@ class Currency
 
 Currency::Currency(const char* priceFileName)
 {
+    logFile("Creating new currency in Currency.h::Currency() (non-default constructor)", 1);
     unsigned int fileNameSize = 0;
     for(; priceFileName[fileNameSize] != 0; fileNameSize++);
 
@@ -124,7 +146,9 @@ Currency::Currency(const char* priceFileName)
 
     readData(m_priceFileName, entries);
 
-    /*struct stat results;
+    /*TEST CODE
+    
+    struct stat results;
     std::ifstream currencyFile(priceFileName, std::ios::in | std::ios::binary);
     if(currencyFile.is_open())
     {
