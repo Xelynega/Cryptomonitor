@@ -1,167 +1,12 @@
 #include "oled.h"
 #include "Currency.h"
+#include "utility.h"
 
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include <fstream>
 #include <mutex>
-
-float power(float num, const float p)
-{
-	//Power function to assist in parsePrice()
-	float constantNum = num;
-	if(p==0)
-		return 1;
-	else if (p < 0)
-	{
-		for(int i = 0; i > p; i--)
-			num = num/constantNum;
-	}
-	else
-	{
-		for(int i = 1; i < p; i++)
-			num = num*constantNum;
-	}
-	return num;
-}
-
-float parsePrice(const char line[])
-{
-	//this is basically a string-to-float function, nothing special, move along.
-	int i = 0;
-	float price = 0;
-	bool escape = true;
-	while(line[i] && escape)
-	{
-		char test = line[i];
-		switch(test)
-		{
-			case '9':
-			case '8':
-			case '7':
-			case '6':
-			case '5':
-			case '4':
-			case '3':
-			case '2':
-			case '1':
-			case '0':
-			{
-				price = price*10 + (test-48);
-				break;
-			}
-			case '.':
-			{
-				 escape = false;
-				 break;
-			}
-			default:
-			{
-				break;
-			}
-
-
-		}
-		i++;
-	}
-
-	int counterDec = 1;
-	escape = true;
-	float decPrice = 0;
-
-	while(line[i] && escape)
-	{
-		char test = line[i];
-		switch(test)
-		{
-			case '9':
-			case '8':
-			case '7':
-			case '6':
-			case '5':
-			case '4':
-			case '3':
-			case '2':
-			case '1':
-			case '0':
-			{
-				decPrice = decPrice+(power(0.1,counterDec) * (test-48));
-				counterDec++;
-				break;
-			}
-			case '.':
-			{
-				 escape = false;
-				 break;
-			}
-			default:
-			{
-				break;
-			}
-
-
-		}
-		i++;
-	}
-
-	float returnPrice = price+decPrice;
-	return returnPrice;
-}
-
-float priceBTC()
-{
-	std::string command;
-	char intake[20];
-	ifstream infile;
-	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD\" | tee mostRecentBTC.txt";//Pull the price and store it in a file
-  system(command.c_str());
-	infile.open("mostRecentBTC.txt");
-	if(!infile.is_open())
-		return -1;
-	infile.getline(intake, 20);//Read the single line of data present
-	if(intake[2] != 'U')//Check to see if its valid
-		return -1;
-	system("rm -R mostRecentBTC.txt");//Delete the file
-	float price = parsePrice(intake);//Parse the price to return the value of the coin
-	return price;
-}
-
-float priceETH()
-{
-	std::string command;
-	char intake[20];
-	ifstream infile;
-	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD\" | tee mostRecentETH.txt";//Pull the price and store it in a file
-	system(command.c_str());
-	infile.open("mostRecentETH.txt");
-	if(!infile.is_open())
-		return -1;
-	infile.getline(intake, 20);//Read the single line of data present
-	if(intake[2] != 'U')//Check to see if its valid
-		return -1;
-	system("rm -R mostRecentETH.txt");//Delete the file
-	float price = parsePrice(intake);//Parse the price to return the value of the coin
-	return price;
-}
-
-float priceLTC()
-{
-	std::string command;
-	char intake[20];
-	ifstream infile;
-	command = "curl -k \"https://min-api.cryptocompare.com/data/price?fsym=LTC&tsyms=USD\" | tee mostRecentLTC.txt";//Pull the price and store it in a file
-	system(command.c_str());
-	infile.open("mostRecentLTC.txt");
-	if(!infile.is_open())
-		return -1;
-	infile.getline(intake, 20);//Read the single line of data present
-	if(intake[2] != 'U')//Check to see if its valid
-		return -1;
-	system("rm -R mostRecentLTC.txt");//Delete the file
-	float price = parsePrice(intake);//Parse the price to return the value of the coin
-	return price;
-}
 
 #define THREAD_SLEEP_TIME_S 60
 
@@ -179,8 +24,27 @@ int priceFetchThread(Currency* cryptos[], bool* finished)
         //Run Ian's pricefetch function
         priceMutex.lock();
         float BTC = priceBTC();
+	if(BTC < 0)
+	{
+		logFile("Bitcoin price not fetched successfully in oled.cpp::priceFetchThread().", -1);
+		//Is there any kind of error handling we want to do here if the price can't be fetched?
+	}
+	    
         float ETH = priceETH();
+	if(ETH < 0)
+	{
+		logFile("Ethereum price not fetched successfully in oled.cpp::priceFetchThread().", -1);
+		//Is there any kind of error handling we want to do here if the price can't be fetched?
+	}
+
         float LTC = priceLTC();
+	if(LTC < 0)
+	{
+		logFile("Litecoin price not fetched successfully in oled.cpp::priceFetchThread().", -1);
+		//Is there any kind of error handling we want to do here if the price can't be fetched?
+	}
+
+	    
         std::cout << BTC << " " << ETH << " " << LTC << std::endl;
         cryptos[BITCOIN]->addPrice(BTC);
         cryptos[ETHEREUM]->addPrice(ETH);;
@@ -192,7 +56,7 @@ int priceFetchThread(Currency* cryptos[], bool* finished)
     }
 }
 
-//These are the bitmaps to be draws for the different screens
+//The map to display the Bitcoin logo on the OLED display
 unsigned char bitcoinMap [] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF,
@@ -226,6 +90,8 @@ unsigned char bitcoinMap [] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+//The map to display the Litecoin Logo on the OLED display.
 unsigned char litecoinMap [] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0xBF, 0xDF, 0xFF, 0xEF,
     0xFF, 0xF7, 0xFB, 0xFB, 0xFF, 0xFD, 0xFD, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -260,6 +126,8 @@ unsigned char litecoinMap [] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F, 0xFF, 0xBF, 0xBF, 0xFF, 0xDF, 0xDF, 0xEF, 0xFF,
     0xF7, 0xFF, 0xFB, 0xFD, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
     };
+
+//The map to display the Ethereum logo on the OLED display
 unsigned char ethereumMap [] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xE0, 0xF0, 0xF8,
