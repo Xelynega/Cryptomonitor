@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include "utility.h"
 
 using namespace std;
 
@@ -40,13 +41,13 @@ void fillEntries(Entry*& entries){
 }
 
 bool readData(const char filename[], Entry*& entries){
-
+    logFile("Reading data in stored price file in FileInterface.cpp::readData().", 0);
     fillEntries(entries); //fill array of entries with default values
 
     fstream file(filename, ios::binary | ios::in); //input stream
 
     if (!file.is_open()){
-      //log failed to open file
+      logFile("Unable to read stored price data in FileInterface.cpp::readData().", -1);
       return false;
     }
     std::cout << "Floats on file: ";
@@ -73,11 +74,11 @@ bool readData(const char filename[], Entry*& entries){
 
 
 bool writeData(const char filename[], Entry* entries){
-
+  logFile("Writing data to stored price file in FileInterface.cpp::writeData().", 0);
   fstream file(filename, ios::binary | ios::out | ios::trunc); //output stream
   //char newLine[1] = {'\n'};  //used to make new lines in binary file
   if (!file.is_open()){
-    //log failed to open file
+    logFile("Unable to write stored price data in FileInterface.cpp::writeData.", -1);
     return false;
   }
 
