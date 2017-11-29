@@ -180,18 +180,27 @@ void updatePrices(float price, float deltaPercent, float deltaPrice)
         oledWriteChar(dPriceString[i]);
 }
 
+drawErrorSign(){}
+
+clearErrorSign(){}
+
 char screenNum = 0;
 char lastScreenNum = -1;
 char numScreens = 3;
 char lastState = false;
 #include <mutex>
 
-void updateGUI(Currency* cryptos[], bool& update, std::mutex* priceMutex)
+void updateGUI(Currency* cryptos[], bool& update, std::mutex* priceMutex, bool fetchError)
 {
     logFile("Updating GUI for OLED in oled.h::updateGUI()", 0);
     int changed = false;
     int buttonState = gpio_get_value(BUTTON_GPIO);
 
+    if(fetchError)
+        drawErrorSign();
+    else
+        clearErrorSign();
+    
     if(buttonState != lastState)
     {
         if(lastState == 0)
