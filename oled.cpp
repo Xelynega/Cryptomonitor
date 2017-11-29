@@ -10,9 +10,13 @@
 
 #define THREAD_SLEEP_TIME_S 60
 
+//Update is to synchronize the oled draw calls with our price fetching functions
 bool update = false;
+//priceMutex is to ensure that price fetching isn't changing our price data while our oled draw / statistics functions are trying to read it.
 std::mutex priceMutex;
 
+
+//Function run on our second thread since fetching prices is a bottleneck.
 int priceFetchThread(Currency* cryptos[], bool* finished)
 {
     while(!(*finished))
@@ -159,9 +163,12 @@ unsigned char ethereumMap [] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
 
+//Main functions
 int main(const int argc, const char* const argv[])
 {
+    //isThreadFinished is to be able to halt the program from withing the second thread
     bool isThreadFinished = false;
+    //Define our currencies and give them a price file/bitmaps
     Currency* cryptos[3];
     cryptos[BITCOIN] = new Currency("bitcoin.dat");
     cryptos[BITCOIN]->m_bitmap = bitcoinMap;
@@ -170,14 +177,17 @@ int main(const int argc, const char* const argv[])
     cryptos[LITECOIN] = new Currency("litecoin.dat");
     cryptos[LITECOIN]->m_bitmap = litecoinMap;
     
+    //Start price fetching threads
     std::thread priceThread(priceFetchThread, cryptos, &isThreadFinished);
 
+    //Main oled loop
     oledInitialize();
     while(!isThreadFinished)
     {
         updateGUI(cryptos, update, &priceMutex);
     }
 
+    //Make sure that we catch that runaway thread
     priceThread.join();
     return 0;
 }
