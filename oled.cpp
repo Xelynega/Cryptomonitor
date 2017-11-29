@@ -12,6 +12,8 @@
 
 //Update is to synchronize the oled draw calls with our price fetching functions
 bool update = false;
+//fetchError is for internet connection
+bool fetchError = false;
 //priceMutex is to ensure that price fetching isn't changing our price data while our oled draw / statistics functions are trying to read it.
 std::mutex priceMutex;
 
@@ -26,6 +28,7 @@ int priceFetchThread(Currency* cryptos[], bool* finished)
         float BTC = priceBTC();
 	if(BTC < 0)
 	{
+		fetchError = true;
 		logFile("Bitcoin price not fetched successfully in oled.cpp::priceFetchThread().", -1);
 		//Is there any kind of error handling we want to do here if the price can't be fetched?
 	}
@@ -33,6 +36,7 @@ int priceFetchThread(Currency* cryptos[], bool* finished)
         float ETH = priceETH();
 	if(ETH < 0)
 	{
+		fetchError = true;
 		logFile("Ethereum price not fetched successfully in oled.cpp::priceFetchThread().", -1);
 		//Is there any kind of error handling we want to do here if the price can't be fetched?
 	}
@@ -40,8 +44,14 @@ int priceFetchThread(Currency* cryptos[], bool* finished)
         float LTC = priceLTC();
 	if(LTC < 0)
 	{
+		fetchError = true;
 		logFile("Litecoin price not fetched successfully in oled.cpp::priceFetchThread().", -1);
 		//Is there any kind of error handling we want to do here if the price can't be fetched?
+	}
+	    
+	if(BTC > 0 && ETH > 0 && LTC > 0)
+	{
+		fetchError = false;	
 	}
 
 	    
@@ -184,7 +194,7 @@ int main(const int argc, const char* const argv[])
     oledInitialize();
     while(!isThreadFinished)
     {
-        updateGUI(cryptos, update, &priceMutex);
+        updateGUI(cryptos, update, &priceMutex, fetchError);
     }
 
     //Make sure that we catch that runaway thread
