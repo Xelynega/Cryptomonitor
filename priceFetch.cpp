@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -172,3 +173,4 @@ int main(const int argc, const char* const argv[])
 	cout << ETH << endl;
 	return 0;
 }
+*/
