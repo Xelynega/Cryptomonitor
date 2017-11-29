@@ -94,14 +94,6 @@ void drawUI(const unsigned char bitmap[])
     oledWriteChar('$');
 }
 
-int randomInt(int max, int min)
-{
-    if(max >= 4 && min <= 4)
-        return 4;
-    else
-        return (min+max)/2;
-}
-
 void updatePrices(float price, float deltaPercent, float deltaPrice)
 {
     oledSetCursorByPixel(2, 70);
