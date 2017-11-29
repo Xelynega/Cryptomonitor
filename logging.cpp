@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <fstream>
 
@@ -158,3 +159,4 @@ int logFile(const char toLog[], int sev)
   }
   return 0;
 }
+*/
