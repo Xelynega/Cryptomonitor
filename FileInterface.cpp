@@ -18,7 +18,9 @@ public:
     return value;
   }
   void setValue(float newValue){
-      value = newValue;
+    if(newValue == -1)
+      return;
+    value = newValue;
   }
 private:
   float value;
@@ -46,22 +48,23 @@ bool readData(const char filename[], Entry*& entries){
     if (!file.is_open()){
       //log failed to open file
       return false;
-  	}
+    }
+    std::cout << "Floats on file: ";
+    for(int i = 0; i < 24; i++)
+     {
+         float temp;
+         file.read((char*)&temp, sizeof(float));
+         entries[i].setValue(temp);
+         std::cout << entries[i].getValue() << ", ";
+        }
+        std::cout << std::endl;
+    
     /*for (int fileLineNumber = 0; fileLineNumber < 24; fileLineNumber++){ //loops 24 times
       //file.seekg(fileLineNumber); //seeks line number
       Entry newEntry; //place holder
       file.read((char *)&newEntry, sizeof(Entry)); //reads binary line, constructs the new entry
       entries[fileLineNumber] = newEntry; //adds new entry to array of entries
     }*/
-    std::cout << "Values in file: ";
-    for(int i = 0; i < 24; i++)
-    {
-        float temp;
-        file.read((char*)&temp, sizeof(float));
-        entries[i].setValue(temp);
-        std::cout << temp << ", ";
-    }
-    std::cout << std::endl;
 
     file.close(); //closes stream
     return true;
@@ -91,19 +94,4 @@ bool writeData(const char filename[], Entry* entries){
 
   file.close(); //closes stream
   return true;
-}
-
-
-
-int main (){
-  Entry* entries;
-  fillEntries(entries);
-  writeData("test.dat", entries);
-  readData("test.dat", entries);
-
- //delete above after you use it once
-//readData will return array of entries
-//keep track of the array of entries and use it when you call writeData
-
-  return 0;
 }

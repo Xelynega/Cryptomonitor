@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Currency.h"
+#include <thread>
 
 #define BUTTON_GPIO 19
 

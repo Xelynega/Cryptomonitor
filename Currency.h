@@ -35,7 +35,9 @@ class Currency
                 average /= (m_size-1);
                 return m_prices[m_size-1] - average;
             }*/
-            return entries[23].getValue(); - entries[0].getValue();
+            float dp = entries[23].getValue() - entries[0].getValue();
+            std::cout << entries[1].getValue() << std::endl;
+            return dp;
         }
         float getDeltaPercent()
         {
@@ -56,7 +58,7 @@ class Currency
                 average /= (m_size-1);
                 return (m_prices[m_size-1] - average) / average;
             }*/
-            return (entries[23].getValue() - entries[0].getValue()) / entries[23].getValue();
+            return ((entries[23].getValue() - entries[0].getValue()) / entries[23].getValue()) * 100;
         }
         float getPrice()
         {
