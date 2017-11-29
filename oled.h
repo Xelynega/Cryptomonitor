@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Currency.h"
+#include "utility.h"
 #include <thread>
 
 #define BUTTON_GPIO 19
@@ -11,6 +12,7 @@ const unsigned char delta[] = {0x70, 0x4C, 0x42, 0x42, 0x4C, 0x70};
 
 void oledInitialize()
 {
+    logFile("Initializing OLED in oled.h::oledInitialize()", 0);
     oledDriverInit();
     oledClear();
     gpio_free(BUTTON_GPIO);
@@ -20,6 +22,7 @@ void oledInitialize()
 
 void drawBorder()
 {
+    logFile("Drawing OLED border in oled.h::drawBorder()", 0);
     oledSetCursorByPixel(0, 0);
     oledWriteByte(0xFF);
     for(int i = 0; i < 126; i++)
@@ -45,6 +48,7 @@ void drawBorder()
 
 void drawBitmap(char column, char row, const unsigned char bitmap[])
 {
+    logFile("Drawing bitmap for OLED in oled.h::drawBitmap()", 0);
     for(int i = 0; i < 8; i++)
     {
         oledSetCursorByPixel(row + i, column);
@@ -57,6 +61,7 @@ void drawBitmap(char column, char row, const unsigned char bitmap[])
 
 void printArray(const unsigned char array[6])
 {
+    logFile("Printing array for OLED in oled.h::printArray()", 0);
     for(int i = 0; i < 6; i++)
     {
         oledWriteByte(array[i]);
@@ -65,6 +70,7 @@ void printArray(const unsigned char array[6])
 
 void drawUI(const unsigned char bitmap[])
 {
+    logFile("Drawing UI for OLED in oled.h::drawUI()", 0);
     drawBitmap(0, 0, bitmap);
     const char* btcString = "$:      ";
     oledSetCursorByPixel(2, 58);
@@ -94,16 +100,9 @@ void drawUI(const unsigned char bitmap[])
     oledWriteChar('$');
 }
 
-int randomInt(int max, int min)
-{
-    if(max >= 4 && min <= 4)
-        return 4;
-    else
-        return (min+max)/2;
-}
-
 void updatePrices(float price, float deltaPercent, float deltaPrice)
 {
+    logFile("Updating prices for OLED in oled.h::updatePrices()", 0);
     oledSetCursorByPixel(2, 70);
     char priceString[16];
     sprintf(priceString, "%f6.6", price);
@@ -189,7 +188,7 @@ char lastState = false;
 
 void updateGUI(Currency* cryptos[], bool& update, std::mutex* priceMutex)
 {
-    
+    logFile("Updating GUI for OLED in oled.h::updateGUI()", 0);
     int changed = false;
     int buttonState = gpio_get_value(BUTTON_GPIO);
 
