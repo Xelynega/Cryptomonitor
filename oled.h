@@ -180,9 +180,20 @@ void updatePrices(float price, float deltaPercent, float deltaPrice)
         oledWriteChar(dPriceString[i]);
 }
 
-drawErrorSign(){}
+const unsigned char error[] = {0x00, 0x00, 0xF3, 0xF3, 0x00, 0x00};
+const unsigned char empty[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-clearErrorSign(){}
+drawErrorSign()
+{
+    oledSetCursorByPixel(0, 120);
+    printArray(error);
+}
+
+clearErrorSign()
+{
+    oledSetCursorByPixel(0, 120);
+    printArray(empty);
+}
 
 char screenNum = 0;
 char lastScreenNum = -1;
