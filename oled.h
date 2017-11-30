@@ -183,13 +183,13 @@ void updatePrices(float price, float deltaPercent, float deltaPrice)
 const unsigned char error[] = {0x00, 0x00, 0xF3, 0xF3, 0x00, 0x00};
 const unsigned char empty[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-drawErrorSign()
+void drawErrorSign()
 {
     oledSetCursorByPixel(0, 120);
     printArray(error);
 }
 
-clearErrorSign()
+void clearErrorSign()
 {
     oledSetCursorByPixel(0, 120);
     printArray(empty);

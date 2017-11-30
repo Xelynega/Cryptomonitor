@@ -1,13 +1,9 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
-#include "utility.h"
 
 #pragma once
-
 using namespace std;
-
-
 
 float parsePrice(const char line[]);
 float power(float num, const float p);
