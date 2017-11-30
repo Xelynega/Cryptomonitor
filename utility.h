@@ -1,5 +1,9 @@
-
+#include <fstream>
+#include <string>
+#include <cstdlib>
 #include "utility.h"
+
+#pragma once
 
 using namespace std;
 
@@ -7,6 +11,7 @@ using namespace std;
 
 float parsePrice(const char line[]);
 float power(float num, const float p);
+int logFile(const char toLog[], int sev);
 
 //Fetches the price of bitcoin from min-api-cryptocompare
 float priceBTC()
